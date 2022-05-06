@@ -17,17 +17,80 @@ class CalcController{
         this.initialize();
         this.initButtonsEvents();
         this.setLastNumberToDisplay();
+        this.initKeyboard();
+        
+    }
+
+    copyToClipboard(){
+        let input = document.createElement('input');
+        input.value = this.displayCalc;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+    }
+    pasteFromClipboard(){
+        document.addEventListener("paste", e=>{
+            let text = e.clipboardData.getData('Text');
+            
+            this.displayCalc = parseFloat(text);
+        });
     }
 
     initialize(){
         
         this.setDisplayDateTime();
-        
+        this.pasteFromClipboard();
         setInterval(() => {
         this.setDisplayDateTime();
 
         }, 1000);
         
+    }
+
+    initKeyboard(){
+        document.addEventListener('keyup', e=>{
+
+            switch (e.key) {
+                case 'Escape':
+                    this.clearAll();
+                break;
+                case 'Backspace':
+                    this.clearEntry();
+                break;
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '%':
+                    this.addOperatoration(e.key);
+                break;
+                case 'Enter':
+                case '=':
+                    this.calc();
+                break;
+                case '.':
+                case ',':
+                    this.addDot();
+                break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':   
+                    this.addOperatoration(parseInt(e.key));
+                break;
+                case 'c':
+                    if(e.ctrlKey) this.copyToClipboard();
+                    break;
+            }
+
+        })
     }
 
     setDisplayDateTime(){
@@ -156,6 +219,8 @@ class CalcController{
     
         let lastOperation = this.getLastOperation();
     
+        if(typeof lastOperation === 'string' && lastOperation && lastOperation.split('').indexOf('.') > -1) return;
+
         if(this.isOperator(lastOperation) || !lastOperation){
             
             this.pushOperation('0.');
@@ -184,7 +249,7 @@ class CalcController{
             } else {
                 
                 let newValue = this.getLastOperation().toString() + value.toString();
-                this.setLastOperation(parseFloat(newValue))
+                this.setLastOperation(newValue)
                 this.setLastNumberToDisplay();
             }
             
