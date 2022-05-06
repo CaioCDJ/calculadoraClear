@@ -11,6 +11,7 @@ class CalcController{
         this._displayCalc = '0';
         this._currentDate;
         this.initialize();
+        this.initButtonsEvents();
     }
 
     initialize(){
@@ -32,6 +33,28 @@ class CalcController{
         });
         this.displayTime = this.currentDate.toLocaleTimeString(this._locale);
     }
+
+    // multiplos eventos
+    addEventListenerAll(element, events, fn){
+        events.split(' ').forEach(event =>{
+            
+            element.addEventListener(event, fn , false);
+        });
+    }
+
+    initButtonsEvents(){
+        let buttons = document.querySelectorAll('#buttons > g, #parts > g');
+    
+        buttons.forEach((btn, index) => {
+            this.addEventListenerAll(btn,'click drag', e => {
+                console.log(btn.className.baseVal.replace('btn-', ''));
+            });
+         
+            this.addEventListenerAll(btn,"mouseover mouseup mousedown", e =>{
+                btn.style.cursor = "pointer";
+            });
+        });
+    } 
 
 
     // -- Getters and Setters --
